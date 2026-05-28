@@ -114,16 +114,16 @@ app.post("/api/whois", async (req, res) => {
   domain = domain.split('/')[0]; // Remove path if any
   domain = domain.split(':')[0]; // Remove port if any
 
-  try {
-    const whois = require('whois-json');
-    const whoisData = await whois.lookup(domain);
-    
-    res.json({
-      domain,
-      whois: whoisData,
-      timestamp: new Date().toISOString()
-    });
-  } catch (err: any) {
+   try {
+     const whoisLookup = await import('whois-json');
+     const whoisData = await whoisLookup.default(domain);
+     
+     res.json({
+       domain,
+       whois: whoisData,
+       timestamp: new Date().toISOString()
+     });
+   } catch (err: any) {
     // Fallback to mock data if whois lookup fails
     console.warn(`Whois lookup failed for ${domain}:`, err.message);
     
