@@ -131,6 +131,7 @@ export default function App() {
 
     setWhoisLoading(true);
     setWhoisError(null);
+    setWhoisResult(null); // Clear previous results
     try {
       const resp = await fetch('/api/whois', {
         method: 'POST',
@@ -456,15 +457,30 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {activeTab === 'subnet' && !result && !loading ? (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <SubnetCalculator />
-          </motion.div>
-        ) : !loading && result ? (
+{activeTab === 'subnet' && !result && !loading ? (
+           <motion.div
+             initial={{ opacity: 0, y: 12 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="space-y-6"
+           >
+             <SubnetCalculator />
+           </motion.div>
+         ) : activeTab === 'whois' && !loading ? (
+           <motion.div
+             initial={{ opacity: 0, y: 12 }}
+             animate={{ opacity: 1, y: 0 }}
+             className="space-y-6"
+           >
+             <WhoisLookup
+               domain={query}
+               setWhoisQuery={setWhoisQuery}
+               whoisResult={whoisResult}
+               whoisError={whoisError}
+               whoisLoading={whoisLoading}
+               onCheckWhois={handleWhoisCheck}
+             />
+           </motion.div>
+         ) : !loading && result ? (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -638,38 +654,20 @@ export default function App() {
                     )}
 
                     {/* SSL Certificates Validator */}
-                    {activeTab === 'cert' && (
-                      <CertValidationPanel 
-                        sslQuery={sslQuery}
-                        setSslQuery={setSslQuery}
-                        sslResult={sslResult}
-                        sslError={sslError}
-                        sslLoading={sslLoading}
-                        onCheckSSL={handleSslCheck}
-                      />
-                    )}
-
-                     {/* Subnet Calculator */}
-                     {activeTab === 'subnet' && (
-                       <SubnetCalculator />
-                     )}
-
-                     {/* Whois Lookup */}
-                     {activeTab === 'whois' && (
-                       <WhoisLookup
-                         domain={result.domain}
-                         setWhoisQuery={setWhoisQuery}
-                         whoisResult={whoisResult}
-                         whoisError={whoisError}
-                         whoisLoading={whoisLoading}
-                         onCheckWhois={handleWhoisCheck}
+{activeTab === 'cert' && (
+                       <CertValidationPanel 
+                         sslQuery={sslQuery}
+                         setSslQuery={setSslQuery}
+                         sslResult={sslResult}
+                         sslError={sslError}
+                         sslLoading={sslLoading}
+                         onCheckSSL={handleSslCheck}
                        />
                      )}
 
 
-
-                  </motion.div>
-                </AnimatePresence>
+                   </motion.div>
+                 </AnimatePresence>
               </div>
 
             </div>

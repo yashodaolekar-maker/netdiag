@@ -3,37 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Globe, 
   AlertCircle, 
-  CheckCircle, 
-  Info, 
   RefreshCw,
   Loader,
-  Terminal,
   FileText,
-  Clock,
-  MapPin,
-  User,
-  Mail,
-  Phone,
   Building,
-  Calendar
+  Calendar,
+  User,
+  ShieldCheck
 } from 'lucide-react';
-
-// Define the Whois data structure
-interface WhoisRecord {
-  domain_name?: string;
-  registrar?: string;
-  whois_server?: string;
-  referral_url?: string;
-  updated_date?: string;
-  creation_date?: string;
-  registry_expiry_date?: string;
-  registrar_iana_id?: string;
-  registrar_abuse_contact_email?: string;
-  registrar_abuse_contact_phone?: string;
-  domain_status?: string[];
-  name_servers?: string[];
-  emails?: string[];
-}
 
 interface WhoisLookupProps {
   domain: string;
@@ -52,7 +29,6 @@ export default function WhoisLookup({
   whoisLoading,
   onCheckWhois,
 }: WhoisLookupProps) {
-  // Loading animation step simulator
   const [loadingStep, setLoadingStep] = useState(0);
   const steps = [
     '🔍 Querying WHOIS database for domain registration...',
@@ -74,7 +50,6 @@ export default function WhoisLookup({
     return () => clearInterval(interval);
   }, [whoisLoading]);
 
-  // Handler for quick checks
   const executeQuickCheck = (domainToCheck: string) => {
     setWhoisQuery(domainToCheck);
     onCheckWhois(undefined, domainToCheck);
@@ -83,7 +58,6 @@ export default function WhoisLookup({
   return (
     <div id="whois-lookup-outer-wrapper" className="bg-white border border-slate-200 rounded-2xl shadow-sm w-full overflow-hidden transition-all duration-300 hover:shadow-md">
       
-      {/* Banner / Header */}
       <div className="bg-slate-900 px-6 py-8 md:px-8 border-b border-slate-800 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -107,7 +81,6 @@ export default function WhoisLookup({
       </div>
 
       <div className="p-6 md:p-8">
-        {/* Domain Search Form - Completely Clean / Blank Box Default */}
         <div className="mb-6">
           <label className="block text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-2 font-mono">
             Domain Registration Check
@@ -159,9 +132,8 @@ export default function WhoisLookup({
             </button>
           </form>
 
-          {/* Quick Checks Recommendations to quickly test the functionality */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wild py-1 font-mono">Quick sandbox tests:</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wild py-1 font-mono">Quick tests:</span>
             {['google.com', 'github.com', 'cloudflare.com', 'amazon.com'].map((dom) => (
               <button
                 key={dom}
@@ -175,7 +147,6 @@ export default function WhoisLookup({
           </div>
         </div>
 
-        {/* Error Block */}
         {whoisError && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
@@ -187,7 +158,6 @@ export default function WhoisLookup({
           </motion.div>
         )}
 
-        {/* Holographic Step-by-Step Loader with sweep bars */}
         <AnimatePresence>
           {whoisLoading && (
             <motion.div
@@ -206,7 +176,6 @@ export default function WhoisLookup({
                   <span>{Math.round(((loadingStep + 1) / steps.length) * 100)}%</span>
                 </div>
                 
-                {/* Active scan progress bar */}
                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden relative">
                   <motion.div 
                     className="h-full bg-indigo-600 rounded-full"
@@ -217,7 +186,6 @@ export default function WhoisLookup({
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent w-36 animate-pulse" style={{ animationDuration: '0.8s' }} />
                 </div>
 
-                {/* Simulated Terminal Steps */}
                 <div className="space-y-2 mt-2 bg-slate-900 border border-slate-800 p-4 rounded-lg font-mono text-xs">
                   {steps.map((step, i) => (
                     <div 
@@ -237,17 +205,15 @@ export default function WhoisLookup({
           )}
         </AnimatePresence>
 
-        {/* Results Block (Shows WHOIS information) */}
-        {!whoisLoading && whoisResult ? (
+        {!whoisLoading && whoisResult && whoisResult.whois ? (
           <motion.div 
+            key={whoisResult.whois?.domainName || Date.now()}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="space-y-8 animate-fadeIn"
+            className="space-y-8"
           >
-            {/* Domain Information Section */}
             <div className="space-y-6">
               
-              {/* Item 1: Domain Name */}
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -259,12 +225,11 @@ export default function WhoisLookup({
                 </div>
                 <div className="flex-1 py-1">
                   <span className="text-base font-semibold text-slate-800 transition-colors">
-                    Domain Name: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.domain || whoisResult.domain_name || 'N/A'}</span>
+                    Domain Name: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.domainName || 'N/A'}</span>
                   </span>
                 </div>
               </motion.div>
 
-              {/* Item 2: Registrar */}
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -276,12 +241,11 @@ export default function WhoisLookup({
                 </div>
                 <div className="flex-1 py-1">
                   <span className="text-base font-semibold text-slate-800 transition-colors">
-                    Registrar: <span className="font-mono bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.registrar || 'N/A'}</span>
+                    Registrar: <span className="font-mono bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.registrar || 'N/A'}</span>
                   </span>
                 </div>
               </motion.div>
 
-              {/* Item 3: Registration Dates */}
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -294,23 +258,22 @@ export default function WhoisLookup({
                 <div className="flex-1 py-1">
                   <div className="space-y-2">
                     <span className="text-base font-semibold text-slate-800 transition-colors">
-                      Registration Date: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.creation_date || 'N/A'}</span>
+                      Registration Date: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.creationDate || 'N/A'}</span>
                     </span>
                   </div>
                   <div className="space-y-2">
                     <span className="text-base font-semibold text-slate-800 transition-colors">
-                      Expiration Date: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.registry_expiry_date || 'N/A'}</span>
+                      Expiration Date: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.registrarRegistrationExpirationDate || 'N/A'}</span>
                     </span>
                   </div>
                   <div className="space-y-2">
                     <span className="text-base font-semibold text-slate-800 transition-colors">
-                      Last Updated: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.updated_date || 'N/A'}</span>
+                      Last Updated: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.updatedDate || 'N/A'}</span>
                     </span>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Item 4: Name Servers */}
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -318,28 +281,6 @@ export default function WhoisLookup({
                 className="flex items-start gap-4 hover:bg-slate-50 p-2 -m-2 rounded-lg transition-colors group"
               >
                 <div className="w-7 h-7 flex-shrink-0 bg-emerald-500 text-white rounded-full flex items-center justify-center p-0.5 border border-emerald-400 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.3)] mt-0.5">
-                  <Server className="w-4 h-4" />
-                </div>
-                <div className="flex-1 py-1">
-                  <span className="text-base font-semibold text-slate-800 transition-colors">
-                    Name Servers: 
-                  </span>
-                  <div className="mt-2 space-y-1">
-                    {(whoisResult.name_servers || []).map((ns: string, index: number) => (
-                      <span key={index} className="inline-block bg-indigo-50 text-indigo-800 px-2 py-1 rounded text-xs font-mono mr-1 mb-1">{ns}</span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Item 5: Domain Status */}
-              <motion.div 
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-             transition={{ delay: 0.25 }}
-                 className="flex items-start gap-4 hover:bg-slate-50 p-2 -m-2 rounded-lg transition-colors group"
-               >
-                 <div className="w-7 h-7 flex-shrink-0 bg-emerald-500 text-white rounded-full flex items-center justify-center p-0.5 border border-emerald-400 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.3)] mt-0.5">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div className="flex-1 py-1">
@@ -347,78 +288,67 @@ export default function WhoisLookup({
                     Domain Status: 
                   </span>
                   <div className="mt-2 space-y-1">
-                    {(whoisResult.domain_status || []).map((status: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2 mb-1">
-                        <div className="w-3 h-3 bg-indigo-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                          ●
+                    {whoisResult.whois?.domainStatus ? (
+                      whoisResult.whois.domainStatus.split(' ').map((status: string, index: number) => (
+                        <div key={index} className="flex items-center gap-2 mb-1">
+                          <div className="w-3 h-3 bg-indigo-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                            ●
+                          </div>
+                          <span className="text-xs font-mono break-all">{status.split('(')[0]}</span>
                         </div>
-                        <span className="text-xs font-mono break-all">{status.split(' ')[0]}</span>
-                      </div>
-                    ))}
+                      ))
+                    ) : []}
                   </div>
                 </div>
               </motion.div>
 
-              {/* Item 6: Contact Information */}
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.25 }}
                 className="flex items-start gap-4 hover:bg-slate-50 p-2 -m-2 rounded-lg transition-colors group"
               >
-                 <div className="w-7 h-7 flex-shrink-0 bg-emerald-500 text-white rounded-full flex items-center justify-center p-0.5 border border-emerald-400 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.3)] mt-0.5">
+                <div className="w-7 h-7 flex-shrink-0 bg-emerald-500 text-white rounded-full flex items-center justify-center p-0.5 border border-emerald-400 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.3)] mt-0.5">
                   <User className="w-4 h-4" />
                 </div>
                 <div className="flex-1 py-1">
                   <div className="space-y-2">
                     <span className="text-base font-semibold text-slate-800 transition-colors">
-                      Abuse Contact Email: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.registrar_abuse_contact_email || 'N/A'}</span>
+                      Registrar Abuse Contact: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.registrarAbuseContact || 'N/A'}</span>
                     </span>
                   </div>
                   <div className="space-y-2">
                     <span className="text-base font-semibold text-slate-800 transition-colors">
-                      Abuse Contact Phone: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.registrar_abuse_contact_phone || 'N/A'}</span>
+                      Abuse Phone: <span className="font-mono bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-sm font-semibold">{whoisResult.whois?.registrarAbuseContactPhone || 'N/A'}</span>
                     </span>
                   </div>
                   <div className="space-y-2">
                     <span className="text-base font-semibold text-slate-800 transition-colors">
-                      Administrative Emails: 
+                      Name Servers: 
                     </span>
                     <div className="mt-1 space-y-1">
-                      {(whoisResult.emails || []).map((email: string, index: number) => (
-                        <span key={index} className="inline-block bg-indigo-50 text-indigo-800 px-2 py-1 rounded text-xs font-mono mr-1 mb-1">{email}</span>
-                      ))}
+                      {whoisResult.whois?.nameServer ? whoisResult.whois.nameServer.split(' ').map((ns: string, index: number) => (
+                        <span key={index} className="inline-block bg-indigo-50 text-indigo-800 px-2 py-1 rounded text-xs font-mono mr-1 mb-1">{ns}</span>
+                      )) : []}
                     </div>
                   </div>
                 </div>
               </motion.div>
+            </div>
 
-              {/* Raw WHOIS Data (Collapsible) */}
-              <div className="mt-8">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-display font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" />
-                    Raw WHOIS Data
-                  </span>
-                  <button
-                    onClick={() => {
-                      // Toggle raw data view - for simplicity, we'll just show it always
-                      // In a full implementation, this would toggle visibility
-                    }}
-                    className="text-[9px] hover:text-indigo-600 text-slate-400 font-semibold uppercase tracking-wider bg-slate-100 border border-slate-200 px-2 py-0.5 rounded transition-colors"
-                  >
-                    View Source
-                  </button>
-                </div>
-                
-                <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-xs whitespace-pre-wrap">
-                  {JSON.stringify(whoisResult, null, 2)}
-                </div>
+            <div className="mt-8">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-display font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" />
+                  Raw WHOIS Data
+                </span>
+              </div>
+              <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-xs whitespace-pre-wrap max-h-96 overflow-y-auto">
+                {JSON.stringify(whoisResult.whois, null, 2)}
               </div>
             </div>
           </motion.div>
-        ) : (
-          /* Blank state empty view showing instructions */
+        ) : !whoisLoading && (
           <div className="text-center py-12 bg-slate-50 border border-dashed border-slate-200 rounded-2xl select-none">
             <FileText className="w-12 h-12 mx-auto text-slate-300 mb-3 animate-pulse" style={{ animationDuration: '4s' }} />
             <h4 className="font-display font-bold text-slate-800 text-sm uppercase tracking-wider">Awaiting WHOIS query</h4>
