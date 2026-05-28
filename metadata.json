@@ -1,0 +1,8 @@
+{
+  "name": "NetDiag Intelligence",
+  "description": "Enterprise-grade networking dashboard for real-time DNS diagnostics, security audits, and AI-powered infrastructure insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
