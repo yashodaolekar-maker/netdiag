@@ -33,6 +33,7 @@ import AlertBanner from './components/AlertBanner';
 import CookieConsent from './components/CookieConsent';
 import SubnetCalculator from './components/SubnetCalculator';
 import WhoisLookup from './components/WhoisLookup';
+import NetworkScannerSplash from './components/NetworkScannerSplash';
 
 const tabDescriptions: Record<string, string> = {
   diagnostics: "Real-time DNS query analysis and server health metrics.",
@@ -62,6 +63,9 @@ export default function App() {
 
   // Alerts Management state
   const [alertsList, setAlertsList] = useState<AppAlert[]>([]);
+
+  // Splash screen state
+  const [showSplash, setShowSplash] = useState(true);
 
   // SSL Certificate parameters
   const [sslQuery, setSslQuery] = useState('');
@@ -96,6 +100,14 @@ export default function App() {
     }
     return () => clearInterval(interval);
   }, [loading]);
+
+  // Auto-dismiss splash screen after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSslCheck = async (e?: React.FormEvent, domainOverride?: string) => {
     e?.preventDefault();
@@ -253,6 +265,14 @@ export default function App() {
   };
 
   return (
+    <>
+      <AnimatePresence>
+        {showSplash && (
+          <NetworkScannerSplash />
+        )}
+      </AnimatePresence>
+      
+      {!showSplash && (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-500/10 selection:text-indigo-900 flex flex-col justify-between">
       
       {/* Background Micro-Decoration (Premium Grain Element) */}
@@ -903,9 +923,10 @@ export default function App() {
         </div>
       </footer>
 
-      <CookieConsent />
+<CookieConsent />
 
     </div>
+      )}</>
   );
 }
 
